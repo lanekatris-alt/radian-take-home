@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { CarsResolver } from './cars.resolver';
+import { CarService, CarsResolver, PrismaService } from './cars.resolver';
 
 @Module({
   imports: [
@@ -13,6 +13,6 @@ import { CarsResolver } from './cars.resolver';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, CarsResolver],
+  providers: [AppService, CarsResolver, PrismaService, CarService],
 })
 export class AppModule {}
