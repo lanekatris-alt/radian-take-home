@@ -1,65 +1,47 @@
-import { Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Car } from '@prisma/client';
+import {
+  CarDto,
+  CreateCarInput,
+  CreateCarsInput,
+  GetCarsByModelResult,
+} from './car.model';
+import { CarService } from './car.service';
 
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient, Car } from '@prisma/client';
-import { CarDto } from './car.model';
-
-@Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
-  async onModuleInit() {
-    await this.$connect();
-  }
-
-  async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
-  }
-}
-
-@Injectable()
-export class CarService {
-  constructor(private prisma: PrismaService) {}
-
-  async getCars(): Promise<Car[]> {
-    return this.prisma.car.findMany();
-  }
-
-  async createCar(): Promise<Car> {
-    const {
-      _max: { vehicleId: lastId },
-    } = await this.prisma.car.aggregate({
-      _max: {
-        vehicleId: true,
-      },
-    });
-
-    // console.log('lastid', lastId._max.vehicleId);
-
-    return this.prisma.car.create({
-      data: { vehicleId: lastId + 1, make: 'Toyota' },
-    });
-  }
-}
-
+// I prefer naming of queries/mutations to start with the object (i.e. cars, carCreate) for sorting purposes in graphiql but going off requirements
 @Resolver((of) => CarDto)
 export class CarsResolver {
   constructor(private service: CarService) {}
 
   @Query((returns) => [CarDto])
-  async GetAllCars(): Promise<Car[]> {
-    const r = await this.service.getCars();
+  GetAllCars(): Promise<Car[]> {
+    return this.service.getCars();
+  }
 
-    return r;
-    // return r.map(x => {
-    //   ...x
-    // })
-    // return [{ id: 1 }, { id: 2 }];
+  @Query(() => [GetCarsByModelResult])
+  GetCarsByModel(): Promise<GetCarsByModelResult[]> {
+    return this.service.getCarsByModel();
   }
 
   @Mutation(() => CarDto)
-  CreateCar() {
-    // const r = await this.service.
-    return this.service.createCar();
+  CreateCar(@Args('input') input: CreateCarInput) {
+    return this.service.createCar(input);
+  }
+
+  // This is NOT a good implementation, it doesn't scale, not performant, not concurrent, can have collisions, and not using database to full potential (like sending multiple documents to write at once)
+  // I assume we'll talk about this 😉
+  // Firstly I would ask what is the use case for an auto incrementing ID. We don't get this functionality natively out of the DB
+  // In a real world scenario I would explore triggers, pub sub of created data and backfilling data, etc.
+  @Mutation(() => [CarDto])
+  async CreateCars(@Args('input') input: CreateCarsInput) {
+    const newCars: Car[] = [];
+
+    // Intentionally synchronous :(
+    for (const entry of input.entries) {
+      const newCar = await this.service.createCar(entry);
+      newCars.push(newCar);
+    }
+
+    return newCars;
   }
 }

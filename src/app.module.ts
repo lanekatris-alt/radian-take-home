@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { CarService, CarsResolver, PrismaService } from './cars.resolver';
+import { CarsResolver } from './cars.resolver';
+import { PrismaService } from './prisma.service';
+import { CarService } from './car.service';
 
+// In a real world I would have a car module since that seems to be a domain. Keeping things simple for a take home
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -12,7 +14,7 @@ import { CarService, CarsResolver, PrismaService } from './cars.resolver';
       autoSchemaFile: true,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, CarsResolver, PrismaService, CarService],
+  controllers: [],
+  providers: [CarsResolver, PrismaService, CarService],
 })
 export class AppModule {}

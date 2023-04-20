@@ -12,6 +12,9 @@ datasource db {
 
 model Car {
     id          String     @id @default(auto()) @map("_id") @db.ObjectId
-    vehicleId   Int?
+    vehicleId   Int
     make        String
+    model       String
+    year        Int
+    color       String
 }

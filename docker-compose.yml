@@ -2,6 +2,7 @@ version: '3.1'
 
 services:
 
+  # Ended up NOT using this since replica sets in docker seems like a pain... so I did mongo atlas 🤷
   mongo:
     image: mongo
     restart: unless-stopped
