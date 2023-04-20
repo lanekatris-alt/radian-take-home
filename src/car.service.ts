@@ -4,6 +4,7 @@ import { Car } from '@prisma/client';
 import { CreateCarInput, GetCarsByModelResult } from './types';
 import { groupBy } from 'lodash';
 
+// I wanted to use CQS patterns but ran out of time
 @Injectable()
 export class CarService {
   constructor(private prisma: PrismaService) {}
