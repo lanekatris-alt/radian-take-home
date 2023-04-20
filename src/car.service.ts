@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { Car } from '@prisma/client';
-import { CreateCarInput, GetCarsByModelResult } from './car.model';
+import { CreateCarInput, GetCarsByModelResult } from './types';
 import { groupBy } from 'lodash';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class CarService {
   // I assume we'll chat on this
   // Can't get results with Mongo's groupBy?
   // Didn't seem worth it to do multiple round trips to the database. Plus, we are loading all data into memory, so why not manipulate in memory
-  // I assume some map reduce could be used? Normally I'd want to push all work to the database if relevant, but for this take home I'm trying to keep things simple
+  // I assume some map reduce could be used? Normally I'd want to push all work to the database if relevant, but for this take home I'm trying to keep things simple and I'd have to brush up on map reduce
   async getCarsByModel(): Promise<GetCarsByModelResult[]> {
     const cars = await this.getCars();
     const grouped = groupBy(cars, 'model');
@@ -27,7 +27,7 @@ export class CarService {
     }));
   }
 
-  // See the resolver for notes, I don't like this solution, it doesn't scale, but keeping things simple for a take home
+  // See the resolver for notes, I don't like this solution, it doesn't scale or handle collisions, but keeping things simple for a take home
   async createCar(input: CreateCarInput): Promise<Car> {
     const {
       _max: { vehicleId: lastId },

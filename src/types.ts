@@ -19,6 +19,7 @@ registerEnumType(Make, {
   name: 'Make',
 });
 
+// I cheat and my DTO/graphql attributed model MATCHES my database... So I don't have to do any mapping in resolvers of types. KISS
 @ObjectType()
 export class CarDto {
   @Field(() => Int)
@@ -57,12 +58,6 @@ export class CreateCarsInput {
   @Field(() => [CreateCarInput])
   entries: CreateCarInput[];
 }
-
-// @InputType()
-// export class GetCarsByModelInput {
-//   @Field(() => String)
-//   model: string;
-// }
 
 @ObjectType()
 export class GetCarsByModelResult {

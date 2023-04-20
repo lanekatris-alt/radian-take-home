@@ -5,15 +5,15 @@ import {
   CreateCarInput,
   CreateCarsInput,
   GetCarsByModelResult,
-} from './car.model';
+} from './types';
 import { CarService } from './car.service';
 
 // I prefer naming of queries/mutations to start with the object (i.e. cars, carCreate) for sorting purposes in graphiql but going off requirements
-@Resolver((of) => CarDto)
+@Resolver(() => CarDto)
 export class CarsResolver {
   constructor(private service: CarService) {}
 
-  @Query((returns) => [CarDto])
+  @Query(() => [CarDto])
   GetAllCars(): Promise<Car[]> {
     return this.service.getCars();
   }
